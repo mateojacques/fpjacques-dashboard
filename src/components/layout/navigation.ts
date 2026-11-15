@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import {
+  ClipboardCheck,
   FolderTree,
   HelpCircle,
   ImagePlus,
@@ -30,6 +31,7 @@ export const navigation: NavSection[] = [
     items: [
       { title: 'Dashboard', href: '/', icon: LayoutDashboard },
       { title: 'Productos', href: '/products', icon: Package },
+      { title: 'Catálogo', href: '/catalogo', icon: ClipboardCheck },
       { title: 'Categorías', href: '/categories', icon: FolderTree },
       { title: 'Carruseles', href: '/carousels', icon: Images },
       { title: 'Ordenes', href: '/orders', icon: ShoppingCart },
@@ -51,7 +53,7 @@ export const navigation: NavSection[] = [
     items: [
       { title: 'Herramientas', href: '/herramientas', icon: Wrench },
       { title: 'Importación en 1 Click', href: '/herramientas/importacion-1-click', icon: Zap },
-      { title: 'Actualizar Imágenes', href: '/herramientas/imagenes', icon: ImagePlus },
+      { title: 'Banco de imágenes', href: '/herramientas/imagenes', icon: ImagePlus },
       // { title: 'Importar CSV', href: '/herramientas/importaciones', icon: FileSpreadsheet },
       // { title: 'Convertir DBF', href: '/herramientas/convertir-dbf', icon: Database },
     ],

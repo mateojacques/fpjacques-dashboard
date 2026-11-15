@@ -40,6 +40,7 @@ import { CsvImportPage } from '@/features/tools/pages/CsvImportPage';
 import { ImportDetailPage } from '@/features/tools/pages/ImportDetailPage';
 import { DbfConvertPage } from '@/features/tools/pages/DbfConvertPage';
 import { BulkImagesPage } from '@/features/tools/pages/BulkImagesPage';
+import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
 import { OneClickImportPage } from '@/features/tools/pages/OneClickImportPage';
 
 // Order pages
@@ -97,6 +98,7 @@ export function AppRoutes() {
         <Route path="products/new" element={<ProductCreatePage />} />
         <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="products/:id/edit" element={<ProductEditPage />} />
+        <Route path="catalogo" element={<CatalogPage />} />
         
         {/* Categories */}
         <Route path="categories" element={<CategoriesPage />} />

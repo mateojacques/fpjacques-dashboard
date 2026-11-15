@@ -1,4 +1,5 @@
 import type { Timestamps } from '@/types/common';
+import type { PublicationIssue, PublicationStatus } from '@/features/catalog/types';
 
 export type Product = {
   id: string;
@@ -17,6 +18,15 @@ export type Product = {
   dimensionHeight: string | null;
   categoryId: string | null;
   isActive: boolean;
+  // From the customer's stock table
+  supplierName: string | null;
+  supplierCode: string | null;
+  barcode: string | null;
+  priceUpdatedAt: string | null;
+  // Set by the catalogue evaluation
+  publicationStatus: PublicationStatus;
+  publicationIssues: PublicationIssue[];
+  publicationCheckedAt: string | null;
   category?: {
     id: string;
     name: string;
@@ -30,9 +40,11 @@ export type ProductsListParams = {
   search?: string;
   categoryId?: string;
   isActive?: boolean;
+  publicationStatus?: PublicationStatus;
+  issue?: PublicationIssue;
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: 'name' | 'sku' | 'regularPrice' | 'createdAt' | 'updatedAt';
+  sortBy?: 'name' | 'sku' | 'regularPrice' | 'price' | 'createdAt' | 'updatedAt' | 'random';
   sortOrder?: 'asc' | 'desc';
 };
 
