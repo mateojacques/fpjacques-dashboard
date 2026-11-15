@@ -129,12 +129,12 @@ export const importsApi = {
     return data;
   },
 
-  // Upload JSON file for bulk image updates
-  uploadBulkImages: async (file: File): Promise<ImportJobResponse> => {
+  // Upload the image bank JSON export; a job copies the photos into S3
+  uploadImageBank: async (file: File): Promise<ImportJobResponse> => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const { data } = await api.post('/api/imports/bulk-images', formData, {
+    const { data } = await api.post('/api/imports/image-bank', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

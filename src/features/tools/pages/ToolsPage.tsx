@@ -15,8 +15,8 @@ const tools = [
     featured: true,
   },
   {
-    title: 'Actualizacion Masiva de Imagenes',
-    description: 'Actualiza imagenes de productos masivamente desde un archivo JSON.',
+    title: 'Banco de imágenes',
+    description: 'Copia al sitio las fotos del banco de imágenes de Bariloche.',
     icon: ImagePlus,
     href: '/herramientas/imagenes',
     color: 'text-orange-600',

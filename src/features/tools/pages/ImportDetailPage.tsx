@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { ImportProgress } from '../components/ImportProgress';
+import { ImportSummaryCard } from '../components/ImportSummaryCard';
 
 export function ImportDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +15,10 @@ export function ImportDetailPage() {
       title="Detalle de Importacion"
       description="Revisa el progreso y estado de la importacion."
     >
-      <ImportProgress jobId={id} />
+      <div className="space-y-6">
+        <ImportProgress jobId={id} />
+        <ImportSummaryCard jobId={id} />
+      </div>
     </PageContainer>
   );
 }

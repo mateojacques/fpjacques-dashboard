@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BulkImageUpdater } from '../components/BulkImageUpdater';
+import { ImageBankUploader } from '../components/ImageBankUploader';
 import { ImportJobsTable } from '../components/ImportJobsTable';
 import { useImportJobs, useCancelImportJob } from '../api/imports.queries';
 
@@ -26,25 +26,25 @@ export function BulkImagesPage() {
   const handleCancelJob = async (id: string) => {
     try {
       await cancelJob.mutateAsync(id);
-      toast.success('Actualizacion cancelada');
+      toast.success('Importación cancelada');
     } catch {
-      toast.error('Error al cancelar la actualizacion');
+      toast.error('No se pudo cancelar la importación');
     }
   };
 
   return (
     <PageContainer
-      title="Actualización Masiva de Imágenes"
-      description="Actualiza imágenes de productos masivamente desde un archivo JSON."
+      title="Banco de imágenes"
+      description="Archivo JSON exportado del banco de imágenes de Bariloche. Las fotos se copian al sitio y se asignan por código de proveedor."
     >
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
-          <TabsTrigger value="actualizar">Nueva Actualización</TabsTrigger>
+          <TabsTrigger value="actualizar">Subir archivo</TabsTrigger>
           <TabsTrigger value="historial">Historial</TabsTrigger>
         </TabsList>
 
         <TabsContent value="actualizar" className="mt-6">
-          <BulkImageUpdater onUploadStarted={handleUploadStarted} />
+          <ImageBankUploader onUploadStarted={handleUploadStarted} />
         </TabsContent>
 
         <TabsContent value="historial" className="mt-6">

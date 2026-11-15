@@ -99,12 +99,12 @@ export function useDownloadTemplate() {
   });
 }
 
-// Upload bulk images JSON file
-export function useUploadBulkImages() {
+// Upload the image bank JSON export
+export function useUploadImageBank() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => importsApi.uploadBulkImages(file),
+    mutationFn: (file: File) => importsApi.uploadImageBank(file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: importKeys.lists() });
     },
