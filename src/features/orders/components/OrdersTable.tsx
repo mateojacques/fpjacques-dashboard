@@ -122,8 +122,13 @@ export function OrdersTable({ orders, isLoading }: OrdersTableProps) {
 
                 {/* Customer Name */}
                 <TableCell>
-                  <div className="font-medium">{order.contactFullName}</div>
-                  <div className="text-sm text-muted-foreground">{order.contactPhone}</div>
+                  <div className="font-medium">
+                    {order.institutionSnapshot?.name ?? order.contactFullName}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {order.institutionSnapshot ? `${order.contactFullName} · ` : ''}
+                    {order.contactPhone}
+                  </div>
                 </TableCell>
 
                 {/* Email */}

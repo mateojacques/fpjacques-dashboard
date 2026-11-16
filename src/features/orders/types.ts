@@ -21,11 +21,37 @@ export type OrderItem = {
   totalPrice: string;
 };
 
+export type IvaStatus =
+  | 'responsable_inscripto'
+  | 'monotributo'
+  | 'exento'
+  | 'consumidor_final';
+
+export const IVA_STATUS_LABELS: Record<IvaStatus, string> = {
+  responsable_inscripto: 'Responsable inscripto',
+  monotributo: 'Monotributo',
+  exento: 'Exento',
+  consumidor_final: 'Consumidor final',
+};
+
+/** The institution as it was when the order was placed. */
+export type InstitutionSnapshot = {
+  name: string;
+  cuit: string | null;
+  legalName: string | null;
+  ivaStatus: IvaStatus | null;
+};
+
 export type Order = {
   id: string;
   orderNumber: string;
   userId: string | null;
   status: OrderStatus;
+  institutionId?: string | null;
+  /** Null on orders placed before institutional accounts. */
+  institutionSnapshot?: InstitutionSnapshot | null;
+  /** Only on the order detail. */
+  user?: { id: string; email: string; fullName: string; phone: string | null } | null;
   contactFullName: string;
   contactEmail: string;
   contactPhone: string;
@@ -79,3 +105,8 @@ export const ORDER_STATUS_VARIANTS: Record<OrderStatus, 'default' | 'secondary' 
   delivered: 'success',
   cancelled: 'destructive',
 };
+
+/** CUIT as it's usually read: 20-12345678-6. */
+export function formatCuit(cuit: string): string {
+  return /^\d{11}$/.test(cuit) ? `${cuit.slice(0, 2)}-${cuit.slice(2, 10)}-${cuit.slice(10)}` : cuit;
+}

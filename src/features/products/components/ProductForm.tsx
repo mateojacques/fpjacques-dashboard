@@ -196,11 +196,11 @@ export function ProductForm({
                 name="regularPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio regular *</FormLabel>
+                    <FormLabel>Precio general *</FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="0" {...field} />
                     </FormControl>
-                    <FormDescription>Precio sin descuentos (ej: 50000)</FormDescription>
+                    <FormDescription>Precio para visitantes sin sesión (ej: 50000)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -231,7 +231,7 @@ export function ProductForm({
                 name="specialPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio especial</FormLabel>
+                    <FormLabel>Precio mayorista</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
@@ -240,7 +240,7 @@ export function ProductForm({
                         value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormDescription>Precio para clientes especiales</FormDescription>
+                    <FormDescription>Precio para instituciones con sesión iniciada</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

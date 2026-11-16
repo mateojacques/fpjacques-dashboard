@@ -1,4 +1,4 @@
-import { RefreshCw, Store, Palette, Image, Phone, Search } from 'lucide-react';
+import { RefreshCw, Store, Palette, Image, Phone, Search, ClipboardList } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,6 +9,7 @@ import { ColorPalette } from '../components/ColorPalette';
 import { BannerManager } from '../components/BannerManager';
 import { ContactForm } from '../components/ContactForm';
 import { SeoSettings } from '../components/SeoSettings';
+import { OrderingForm } from '../components/OrderingForm';
 import { useStorefrontConfig } from '../api/storefront-config.queries';
 
 export function StorefrontConfigPage() {
@@ -55,7 +56,7 @@ export function StorefrontConfigPage() {
       }
     >
       <Tabs defaultValue="branding" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-none lg:inline-flex">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 lg:w-auto lg:grid-cols-none lg:inline-flex">
           <TabsTrigger value="branding" className="gap-2">
             <Store className="h-4 w-4 hidden sm:inline" />
             Marca
@@ -71,6 +72,10 @@ export function StorefrontConfigPage() {
           <TabsTrigger value="contact" className="gap-2">
             <Phone className="h-4 w-4 hidden sm:inline" />
             Contacto
+          </TabsTrigger>
+          <TabsTrigger value="ordering" className="gap-2">
+            <ClipboardList className="h-4 w-4 hidden sm:inline" />
+            Pedidos
           </TabsTrigger>
           <TabsTrigger value="seo" className="gap-2">
             <Search className="h-4 w-4 hidden sm:inline" />
@@ -92,6 +97,10 @@ export function StorefrontConfigPage() {
 
         <TabsContent value="contact">
           <ContactForm initialData={config.contact} />
+        </TabsContent>
+
+        <TabsContent value="ordering">
+          <OrderingForm initialData={config.ordering} />
         </TabsContent>
 
         <TabsContent value="seo">

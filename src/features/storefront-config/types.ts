@@ -80,6 +80,12 @@ export type SeoConfig = {
   ogImage: string | null;
 };
 
+// Ordering notices (store-wide lines on the product page, cart and checkout)
+export type OrderingConfig = {
+  availabilityNotice: string;
+  minimumOrderNotice: string;
+};
+
 // Legal configuration
 export type LegalConfig = {
   termsMarkdown: string;
@@ -96,6 +102,7 @@ export type StorefrontConfig = {
   faq: FaqItem[];
   contact: ContactConfig;
   seo: SeoConfig;
+  ordering?: OrderingConfig;
   legal: LegalConfig;
 };
 
@@ -110,6 +117,7 @@ export type UpdateColorsInput = Partial<ColorsConfig>;
 export type UpdateBannersInput = Partial<BannersConfig>;
 export type UpdateContactInput = Partial<ContactConfig>;
 export type UpdateSeoInput = Partial<SeoConfig>;
+export type UpdateOrderingInput = OrderingConfig;
 export type UpdateFaqInput = {
   faq: Omit<FaqItem, 'id'>[];
 };

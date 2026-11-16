@@ -6,6 +6,7 @@ import type {
   UpdateBannersInput,
   UpdateContactInput,
   UpdateSeoInput,
+  UpdateOrderingInput,
 } from '../types';
 
 // Query keys
@@ -76,6 +77,18 @@ export function useUpdateSeo() {
 
   return useMutation({
     mutationFn: (input: UpdateSeoInput) => storefrontConfigApi.updateSeo(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: storefrontConfigKeys.config() });
+    },
+  });
+}
+
+// Update ordering notices mutation
+export function useUpdateOrdering() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: UpdateOrderingInput) => storefrontConfigApi.updateOrdering(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: storefrontConfigKeys.config() });
     },

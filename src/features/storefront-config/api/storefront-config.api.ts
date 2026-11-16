@@ -6,6 +6,7 @@ import type {
   UpdateBannersInput,
   UpdateContactInput,
   UpdateSeoInput,
+  UpdateOrderingInput,
   UpdateFaqInput,
   StorefrontConfig,
 } from '../types';
@@ -97,6 +98,13 @@ export const storefrontConfigApi = {
   updateSeo: async (input: UpdateSeoInput): Promise<StorefrontConfigResponse> => {
     const cleanedInput = removeNullValues(input);
     const { data } = await api.patch('/api/storefront/config/seo', cleanedInput);
+    return data;
+  },
+
+  // Update ordering notices section (admin). Empty strings are meaningful
+  // (an empty minimum-order notice hides the line), so they are sent as is.
+  updateOrdering: async (input: UpdateOrderingInput): Promise<StorefrontConfigResponse> => {
+    const { data } = await api.patch('/api/storefront/config/ordering', input);
     return data;
   },
 
