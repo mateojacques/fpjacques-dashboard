@@ -10,6 +10,9 @@ type StoreLogoProps = {
   className?: string;
 };
 
+/** Bundled logo, used when no logo was uploaded in Apariencia › Marca. */
+export const DEFAULT_LOGO_URL = '/logo.jpg';
+
 // Same proportions as the storefront header box, so the logo crops identically.
 const boxes = {
   sm: 'h-10 w-[114px]',
@@ -17,15 +20,24 @@ const boxes = {
   lg: 'h-[72px] w-[206px]',
 };
 
+// The bundled logo is square: same height, square box.
+const squareBoxes = {
+  sm: 'size-10 rounded-md',
+  md: 'size-[56px] rounded-md',
+  lg: 'size-[72px] rounded-lg',
+};
+
 /**
  * The store's own logo, as uploaded in Apariencia › Marca. Without one, the
- * store name is set as a wordmark, exactly as the storefront does.
+ * bundled logo is shown; if an image fails to load, the store name is set as
+ * a wordmark.
  */
 export function StoreLogo({ onDark = false, size = 'md', className }: StoreLogoProps) {
   const { storeName, headerLogoUrl, footerLogoUrl, isLoading } = useBrand();
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
 
-  const url = onDark ? (footerLogoUrl ?? headerLogoUrl) : headerLogoUrl;
+  const configuredUrl = onDark ? (footerLogoUrl ?? headerLogoUrl) : headerLogoUrl;
+  const url = configuredUrl ?? DEFAULT_LOGO_URL;
 
   if (isLoading) {
     return <Skeleton className={cn(boxes[size], className)} />;
@@ -36,7 +48,11 @@ export function StoreLogo({ onDark = false, size = 'md', className }: StoreLogoP
       <img
         src={url}
         alt={storeName}
-        className={cn(boxes[size], 'shrink-0 object-cover object-center', className)}
+        className={cn(
+          configuredUrl ? boxes[size] : squareBoxes[size],
+          'block shrink-0 object-cover object-center',
+          className
+        )}
         onError={() => setFailedUrl(url)}
       />
     );

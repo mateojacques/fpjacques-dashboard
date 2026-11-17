@@ -56,16 +56,12 @@ export function PanelThemeSync() {
 
   useEffect(() => {
     let link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-    if (!faviconUrl) {
-      link?.remove();
-      return;
-    }
     if (!link) {
       link = document.createElement('link');
       link.rel = 'icon';
       document.head.appendChild(link);
     }
-    link.href = faviconUrl;
+    link.href = faviconUrl ?? '/logo.jpg';
   }, [faviconUrl]);
 
   return null;
