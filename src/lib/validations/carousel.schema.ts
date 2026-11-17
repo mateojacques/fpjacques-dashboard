@@ -33,12 +33,17 @@ export const carouselSchema = z.object({
 
 export type CarouselFormData = z.infer<typeof carouselSchema>;
 
-// Transform form data for API submission
-export function transformCarouselFormData(data: CarouselFormData) {
+// Transform form data for API submission. An empty description is left out
+// on create (the API rejects null there) and sent as null on update to clear it.
+export function transformCarouselFormData(
+  data: CarouselFormData,
+  { isUpdate = false }: { isUpdate?: boolean } = {}
+) {
+  const description = data.description?.trim();
   return {
     ...data,
     slug: data.slug || undefined,
-    description: data.description || null,
+    description: description || (isUpdate ? null : undefined),
     categoryId: data.type === 'category' ? data.categoryId || null : null,
   };
 }

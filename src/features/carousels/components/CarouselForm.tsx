@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useCategories } from '@/features/categories/api/categories.queries';
-import { flattenCategoryTree } from '@/features/categories/types';
+import {
+  flattenCategoryTree,
+  type Category,
+} from '@/features/categories/types';
 import {
   carouselSchema,
   type CarouselFormData,
@@ -29,6 +32,19 @@ import {
 import { slugify } from '@/lib/utils';
 import { CAROUSEL_TYPE } from '@/lib/constants';
 import type { Carousel } from '../types';
+
+// Drops inactive categories and everything under them: the store doesn't show
+// them, so a carousel pointing there would come out empty.
+function onlyActiveCategories(categories: Category[]): Category[] {
+  return categories
+    .filter((category) => category.isActive)
+    .map((category) => ({
+      ...category,
+      children: category.children
+        ? onlyActiveCategories(category.children)
+        : undefined,
+    }));
+}
 
 type CarouselFormProps = {
   carousel?: Carousel;
@@ -43,10 +59,16 @@ export function CarouselForm({
 }: CarouselFormProps) {
   const { data: categoriesData } = useCategories();
 
-  // Flatten categories for dropdown
   const flatCategories = categoriesData?.data
-    ? flattenCategoryTree(categoriesData.data)
+    ? flattenCategoryTree(onlyActiveCategories(categoriesData.data))
     : [];
+  // Keep an existing carousel's category selectable even if it was deactivated,
+  // so the field doesn't look empty when editing.
+  const currentCategory =
+    carousel?.category &&
+    !flatCategories.some((cat) => cat.id === carousel.category?.id)
+      ? carousel.category
+      : null;
 
   const form = useForm<CarouselFormData>({
     resolver: zodResolver(carouselSchema),
@@ -61,16 +83,11 @@ export function CarouselForm({
     },
   });
 
-  const nameValue = form.watch('name');
-  const slugValue = form.watch('slug');
   const typeValue = form.watch('type');
 
-  // Auto-generate slug from name if slug is empty
-  useEffect(() => {
-    if (nameValue && !slugValue && !carousel) {
-      form.setValue('slug', slugify(nameValue));
-    }
-  }, [nameValue, slugValue, carousel, form]);
+  // The slug follows the name until the user types their own (an existing
+  // carousel's slug is never rewritten). Clearing the slug resumes following.
+  const slugEditedRef = useRef(!!carousel);
 
   return (
     <Form {...form}>
@@ -82,7 +99,18 @@ export function CarouselForm({
             <FormItem>
               <FormLabel>Nombre *</FormLabel>
               <FormControl>
-                <Input placeholder="Nombre del carrusel" {...field} />
+                <Input
+                  placeholder="Nombre del carrusel"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    if (!slugEditedRef.current) {
+                      form.setValue('slug', slugify(e.target.value), {
+                        shouldValidate: form.formState.isSubmitted,
+                      });
+                    }
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,7 +124,14 @@ export function CarouselForm({
             <FormItem>
               <FormLabel>Slug</FormLabel>
               <FormControl>
-                <Input placeholder="nombre-del-carrusel" {...field} />
+                <Input
+                  placeholder="nombre-del-carrusel"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    slugEditedRef.current = e.target.value !== '';
+                  }}
+                />
               </FormControl>
               <FormDescription>
                 URL amigable. Se genera automáticamente del nombre.
@@ -174,6 +209,11 @@ export function CarouselForm({
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="__none__">Selecciona una categoría</SelectItem>
+                    {currentCategory && (
+                      <SelectItem value={currentCategory.id}>
+                        {currentCategory.name} (inactiva)
+                      </SelectItem>
+                    )}
                     {flatCategories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
                         {'  '.repeat(cat.level)}
@@ -185,6 +225,7 @@ export function CarouselForm({
                 </Select>
                 <FormDescription>
                   Los productos de esta categoría se mostrarán automáticamente.
+                  Solo se listan las categorías activas.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

@@ -130,7 +130,9 @@ export function CarouselsPage() {
 
   // Submit create/update form
   const handleSubmit = async (formData: CarouselFormData) => {
-    const data = transformCarouselFormData(formData);
+    const data = transformCarouselFormData(formData, {
+      isUpdate: !!dialog.carousel,
+    });
 
     try {
       if (dialog.carousel) {

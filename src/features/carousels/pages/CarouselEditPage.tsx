@@ -42,7 +42,7 @@ export function CarouselEditPage() {
   const handleSubmit = async (formData: CarouselFormData) => {
     if (!carousel) return;
 
-    const data = transformCarouselFormData(formData);
+    const data = transformCarouselFormData(formData, { isUpdate: true });
 
     try {
       await updateCarousel.mutateAsync({
