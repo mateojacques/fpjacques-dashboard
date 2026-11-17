@@ -20,12 +20,6 @@ export const productSchema = z.object({
     .nullable()
     .optional()
     .or(z.literal('')),
-  specialPrice: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, 'Precio especial inválido')
-    .nullable()
-    .optional()
-    .or(z.literal('')),
   imageUrl: z.string().url('URL de imagen inválida').nullable().optional().or(z.literal('')),
   thumbnailUrl: z.string().url('URL de thumbnail inválida').nullable().optional().or(z.literal('')),
   videoUrl: z.string().url('URL de video inválida').nullable().optional().or(z.literal('')),
@@ -44,7 +38,6 @@ export function transformProductFormData(data: ProductFormData) {
   return {
     ...data,
     salePrice: data.salePrice || null,
-    specialPrice: data.specialPrice || null,
     imageUrl: data.imageUrl || null,
     thumbnailUrl: data.thumbnailUrl || null,
     videoUrl: data.videoUrl || null,

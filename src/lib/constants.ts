@@ -13,7 +13,6 @@ export const ROUTES = {
   PRODUCT_CREATE: '/products/new',
   PRODUCT_EDIT: '/products/:id/edit',
   PRODUCT_DETAIL: '/products/:id',
-  PUBLICATION: '/publicacion',
   CATEGORIES: '/categories',
   CAROUSELS: '/carousels',
   CAROUSEL_EDIT: '/carousels/:id',
@@ -23,9 +22,6 @@ export const ROUTES = {
   FAQ: '/content/faq',
   TERMS: '/content/terms',
   CONTACT: '/content/contact',
-  IMPORT_ONE_CLICK: '/herramientas/importacion-1-click',
-  IMPORT_DETAIL: '/herramientas/importaciones/:id',
-  IMAGE_BANK: '/herramientas/imagenes',
 } as const;
 
 export const ORDER_STATUS = {
@@ -34,14 +30,6 @@ export const ORDER_STATUS = {
   PROCESSING: 'processing',
   SHIPPED: 'shipped',
   DELIVERED: 'delivered',
-  CANCELLED: 'cancelled',
-} as const;
-
-export const IMPORT_JOB_STATUS = {
-  PENDING: 'pending',
-  PROCESSING: 'processing',
-  COMPLETED: 'completed',
-  FAILED: 'failed',
   CANCELLED: 'cancelled',
 } as const;
 

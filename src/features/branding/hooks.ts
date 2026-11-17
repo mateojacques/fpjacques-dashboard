@@ -54,7 +54,7 @@ export function useBrand(): Brand {
   }
 
   return {
-    storeName: cached?.storeName ?? 'San Pablo',
+    storeName: cached?.storeName ?? 'FP Jacques',
     headerLogoUrl: cached?.headerLogoUrl ?? null,
     footerLogoUrl: cached?.footerLogoUrl ?? null,
     faviconUrl: cached?.faviconUrl ?? null,

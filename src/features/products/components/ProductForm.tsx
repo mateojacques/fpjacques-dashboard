@@ -58,7 +58,6 @@ export function ProductForm({
       description: product?.description ?? '',
       regularPrice: product?.regularPrice ?? '',
       salePrice: product?.salePrice ?? '',
-      specialPrice: product?.specialPrice ?? '',
       imageUrl: product?.imageUrl ?? '',
       thumbnailUrl: product?.thumbnailUrl ?? '',
       videoUrl: product?.videoUrl ?? '',
@@ -196,11 +195,11 @@ export function ProductForm({
                 name="regularPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio general *</FormLabel>
+                    <FormLabel>Precio *</FormLabel>
                     <FormControl>
                       <Input type="text" placeholder="0" {...field} />
                     </FormControl>
-                    <FormDescription>Precio para visitantes sin sesión (ej: 50000)</FormDescription>
+                    <FormDescription>Precio de venta (ej: 50000)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -220,31 +219,12 @@ export function ProductForm({
                         value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormDescription>Precio con descuento (opcional)</FormDescription>
+                    <FormDescription>Precio con descuento (opcional). Mientras sea menor al precio, la tienda muestra el precio tachado</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="specialPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio mayorista</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="0"
-                        {...field}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormDescription>Precio para instituciones con sesión iniciada</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
           </Card>
 

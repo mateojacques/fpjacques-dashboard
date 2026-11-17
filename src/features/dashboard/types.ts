@@ -9,7 +9,6 @@ export type MetricsOverview = {
   totalProducts: number;
   totalCategories: number;
   totalOrders: number;
-  lastSuccessfulImportAt: string | null;
   dateRange: DateRange | null;
 };
 

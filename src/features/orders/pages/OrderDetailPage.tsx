@@ -8,7 +8,6 @@ import {
   MapPin,
   Calendar,
   FileText,
-  Building2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -38,8 +37,6 @@ import {
   ORDER_STATUSES,
   ORDER_STATUS_LABELS,
   ORDER_STATUS_VARIANTS,
-  IVA_STATUS_LABELS,
-  formatCuit,
   type OrderStatus,
 } from '../types';
 
@@ -250,44 +247,6 @@ export function OrderDetailPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Institution, as it was when the order was placed */}
-          {order.institutionSnapshot && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Institución
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="space-y-3 text-sm">
-                  <div>
-                    <dt className="text-muted-foreground">Nombre</dt>
-                    <dd className="font-medium">{order.institutionSnapshot.name}</dd>
-                  </div>
-                  {order.institutionSnapshot.cuit && (
-                    <div>
-                      <dt className="text-muted-foreground">CUIT</dt>
-                      <dd>{formatCuit(order.institutionSnapshot.cuit)}</dd>
-                    </div>
-                  )}
-                  {order.institutionSnapshot.legalName && (
-                    <div>
-                      <dt className="text-muted-foreground">Razón social</dt>
-                      <dd>{order.institutionSnapshot.legalName}</dd>
-                    </div>
-                  )}
-                  {order.institutionSnapshot.ivaStatus && (
-                    <div>
-                      <dt className="text-muted-foreground">Condición frente al IVA</dt>
-                      <dd>{IVA_STATUS_LABELS[order.institutionSnapshot.ivaStatus]}</dd>
-                    </div>
-                  )}
-                </dl>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Order info */}
           <Card>

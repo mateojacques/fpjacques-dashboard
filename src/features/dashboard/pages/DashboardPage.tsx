@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronRight, FolderTree, Images, Package, Zap, type LucideIcon } from 'lucide-react';
+import { ChevronRight, FolderTree, Images, Package, Plus, type LucideIcon } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,10 +22,10 @@ type Shortcut = {
 
 const shortcuts: Shortcut[] = [
   {
-    title: 'Importación en 1 Click',
-    description: 'Sube el DBF del sistema de inventario y actualiza los productos.',
-    href: ROUTES.IMPORT_ONE_CLICK,
-    icon: Zap,
+    title: 'Nuevo producto',
+    description: 'Agrega un producto al catálogo.',
+    href: ROUTES.PRODUCT_CREATE,
+    icon: Plus,
   },
   {
     title: 'Catálogo',
@@ -93,7 +93,6 @@ export function DashboardPage() {
 
   const metrics = data?.data;
   const inRange = Boolean(metricsParams.startDate || metricsParams.endDate);
-  const lastImport = metrics?.lastSuccessfulImportAt ? new Date(metrics.lastSuccessfulImportAt) : null;
   const firstName = user?.fullName?.split(' ')[0];
 
   return (
@@ -119,7 +118,7 @@ export function DashboardPage() {
             </Alert>
           )}
 
-          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 xl:grid-cols-4">
+          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
             <Stat
               label="Productos"
               value={metrics ? formatNumber(metrics.totalProducts) : '—'}
@@ -139,17 +138,6 @@ export function DashboardPage() {
               value={metrics ? formatNumber(metrics.totalOrders) : '—'}
               detail={inRange ? 'recibidas en el período' : 'recibidas en total'}
               href={ROUTES.ORDERS}
-              isLoading={isLoading}
-            />
-            <Stat
-              label="Última importación"
-              value={lastImport ? format(lastImport, 'd MMM yyyy', { locale: es }) : 'Nunca'}
-              detail={
-                lastImport
-                  ? `${capitalize(formatDistanceToNow(lastImport, { locale: es, addSuffix: true }))}, ${format(lastImport, 'HH:mm')} h`
-                  : 'Todavía no se importó ningún DBF'
-              }
-              href={ROUTES.IMPORT_ONE_CLICK}
               isLoading={isLoading}
             />
           </dl>

@@ -1,8 +1,8 @@
-# AGENTS.md - San Pablo Dashboard v2
+# AGENTS.md - FP Jacques Dashboard
 
 ## Project Overview
 
-Administrative dashboard for an art store/bookstore (San Pablo). This SPA provides management capabilities for:
+Administrative dashboard for the FP Jacques online store (a small catalogue, about 20 products, sold to individual customers). Forked from `sanpablo-dashboard-v2` (the `upstream` remote) without the DBF import, image bank and publication review tools. This SPA provides management capabilities for:
 - **Dashboard metrics**: sales/order overview with date range filtering
 - **Product management**: CRUD, search, filtering, manual editing
 - **Categories**: category tree with ordering
@@ -10,7 +10,6 @@ Administrative dashboard for an art store/bookstore (San Pablo). This SPA provid
 - **Orders**: order list, detail and status updates
 - **Brand customization**: logos, colors, banners (including hero banner), contact & social links, SEO
 - **Content management**: Terms & Conditions, FAQ
-- **Bulk import tools**: 1-click DBF import, image bank
 - **Panel theme**: the panel takes the store's logo and palette; each admin picks light/dark, accent color and sidebar style
 
 The UI is in Spanish (labels, toasts, validation messages); numbers are formatted with the `es-AR` locale.
@@ -37,7 +36,6 @@ The dashboard consumes a REST API documented at `http://localhost:3000/api/docs`
 | Icons | Lucide React | 0.469+ |
 | Drag & Drop | @dnd-kit | core 6.x / sortable 10.x |
 | Notifications | Sonner | 1.7+ |
-| File Drop | react-dropzone | 14.x |
 | Dates | date-fns | 4.x |
 | Linting | ESLint (flat config) + typescript-eslint | 9.x |
 
@@ -48,7 +46,7 @@ There is no test runner configured.
 ## Project Structure
 
 ```
-sanpablo-dashboard-v2/
+fpjacques-dashboard/
 ├── public/
 │   └── _redirects                  # SPA fallback: /* -> /index.html 200
 ├── src/
@@ -117,19 +115,10 @@ sanpablo-dashboard-v2/
 │   │   │   ├── pages/StorefrontConfigPage.tsx
 │   │   │   └── types.ts
 │   │   │
-│   │   ├── content/                # FAQ & Terms (stored in storefront config)
-│   │   │   ├── api/
-│   │   │   ├── components/         # FaqEditor, FaqItemDialog, TermsEditor
-│   │   │   ├── pages/              # FaqPage, TermsPage
-│   │   │   └── types.ts
-│   │   │
-│   │   └── tools/
-│   │       ├── api/                # imports.api.ts, imports.queries.ts
-│   │       ├── components/         # OneClickImporter, OneClickImportDebugPanel,
-│   │       │                       # ImageBankUploader, ImportJobsTable,
-│   │       │                       # ImportProgress, ImportJobsTable
-│   │       ├── pages/              # OneClickImportPage, ImportDetailPage,
-│   │       │                       # BulkImagesPage
+│   │   └── content/                # FAQ & Terms (stored in storefront config)
+│   │       ├── api/
+│   │       ├── components/         # FaqEditor, FaqItemDialog, TermsEditor
+│   │       ├── pages/              # FaqPage, TermsPage
 │   │       └── types.ts
 │   │
 │   ├── lib/
@@ -137,19 +126,16 @@ sanpablo-dashboard-v2/
 │   │   ├── utils.ts                # cn() and other utilities
 │   │   ├── constants.ts            # App constants (API_URL, ROUTES, PAGINATION, statuses)
 │   │   └── validations/            # Zod schemas: auth, product, category, carousel,
-│   │                               # storefront, content, bulk-images
+│   │                               # storefront, content
 │   │
 │   ├── hooks/
 │   │   ├── useAuth.ts              # Auth hook wrapping store (+ isAdmin / isOwner)
 │   │   ├── useDebounce.ts          # Debounce hook for search
 │   │   └── useMediaQuery.ts        # Responsive breakpoints
 │   │
-│   ├── product-images/             # JSON payloads for bulk image updates
-│   │
 │   ├── types/
 │   │   ├── api.ts                  # Generic API response types
-│   │   ├── common.ts               # Shared types (Timestamps, ...)
-│   │   └── parsedbf.d.ts
+│   │   └── common.ts               # Shared types (Timestamps, ...)
 │   │
 │   ├── styles/
 │   │   └── globals.css             # Tailwind directives + custom styles
@@ -231,7 +217,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
 - Utils/API: `camelCase.ts` (e.g., `products.api.ts`)
 - Types: `camelCase.ts` (e.g., `types.ts`)
 - Pages: `PascalCase.tsx` with `Page` suffix (e.g., `ProductsListPage.tsx`)
-- Zod schemas: `kebab-case.schema.ts` (e.g., `bulk-images.schema.ts`)
+- Zod schemas: `kebab-case.schema.ts` (e.g., `product.schema.ts`)
 
 ### Import Order
 
@@ -261,7 +247,7 @@ import type { Product } from '../types';
 
 All routes live in `src/app/routes.tsx`. Everything except `/login` is nested under `ProtectedRoute` → `MainLayout`; `/login` is wrapped in `PublicRoute` (redirects home when already authenticated).
 
-Tool routes use Spanish paths under `/herramientas/...` (e.g. `/herramientas/importacion-1-click`, `/herramientas/imagenes`, `/herramientas/importaciones/:id`). They are listed in the `ROUTES` constant in `src/lib/constants.ts`. The old tools index, CSV import (`/herramientas/importaciones`) and DBF→CSV (`/herramientas/convertir-dbf`) pages were retired and redirect to the 1-click import.
+Route paths are listed in the `ROUTES` constant in `src/lib/constants.ts`.
 
 Sidebar entries are declared in `src/components/layout/navigation.ts`.
 
@@ -352,7 +338,7 @@ export const productsApi = {
 };
 ```
 
-Multipart uploads (imports) build a `FormData` and pass `headers: { 'Content-Type': 'multipart/form-data' }`.
+Multipart uploads (product images) build a `FormData` and pass `headers: { 'Content-Type': 'multipart/form-data' }`.
 
 ### Response Shapes
 
@@ -362,9 +348,8 @@ Single items are `{ data: T }`. **Paginated list shapes differ per endpoint**, s
 |----------|-------|
 | `GET /api/products` | `{ data: Product[], total, page, limit, totalPages }` |
 | `GET /api/orders` | `{ data: Order[], meta: { total, page, limit, totalPages } }` |
-| `GET /api/imports` | `{ data: { items: ImportJob[], total, page, limit, totalPages } }` |
 
-`PaginatedResponse<T>` in `src/types/api.ts` matches only the imports shape and is currently unused.
+`PaginatedResponse<T>` in `src/types/api.ts` is unused.
 
 ### Null Stripping for Storefront Config
 
@@ -441,10 +426,6 @@ export function useDeleteProduct() {
   });
 }
 ```
-
-### Polling Long-Running Jobs
-
-`useImportJob` (`src/features/tools/api/imports.queries.ts`) uses a function `refetchInterval` that polls every 2s only while the job status is `pending` or `processing`, then stops. Use the same approach for any other async job.
 
 ---
 
@@ -646,7 +627,7 @@ These are the endpoints the dashboard calls (see `src/features/*/api/*.api.ts`).
 | GET | `/api/products/:id` | Get product by ID |
 | GET | `/api/products/sku/:sku` | Get product by SKU |
 | POST | `/api/products` | Create product |
-| PUT | `/api/products/:id` | Update product (also used to toggle `isActive`) |
+| PUT | `/api/products/:id` | Update product (also used to toggle `isActive`). Prices are `regularPrice` and an optional `salePrice`; there is no wholesale price |
 | DELETE | `/api/products/:id` | Delete product (soft) |
 
 **Query params for list** (`ProductsListParams`):
@@ -706,29 +687,6 @@ These are the endpoints the dashboard calls (see `src/features/*/api/*.api.ts`).
 | PATCH | `/api/storefront/config/legal` | Update Terms & Conditions |
 
 The `content` feature (FAQ / Terms pages) reads and writes through these same endpoints.
-
-### Imports
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/imports` | List import jobs (`page`, `limit`, `status`) |
-| GET | `/api/imports/:id` | Get job details |
-| POST | `/api/imports` | Create import job (multipart CSV `file`) |
-| POST | `/api/imports/:id/cancel` | Cancel job |
-| GET | `/api/imports/template` | Download CSV template (blob) |
-| POST | `/api/imports/bulk-images` | Bulk image update (multipart JSON `file`) |
-| POST | `/api/imports/dbf` | Create import job from a DBF (multipart `file`, max 100MB) → `{ data: ImportJob }` |
-| POST | `/api/imports/dbf/csv?format=api\|raw` | Convert a DBF to CSV without importing (blob; row count in `X-Row-Count`) |
-| GET | `/api/imports/:id/file` | Download the file a job imported (blob) |
-
----
-
-## Import Tools
-
-- **This repo does no DBF parsing.** All DBF knowledge (reader, field mapping, CSV format) lives in `sanpablo-api-v2/src/modules/imports/dbf/`.
-- **1-click import** (`OneClickImporter.tsx`): the user drops a Visual FoxPro `.dbf` (max 100MB, extension checked case-insensitively) and it is uploaded as-is to `POST /api/imports/dbf`, which converts it and creates a CSV import job. Progress is shown by polling the job.
-- **Imported file**: `GET /api/imports/:id/file` serves the exact file a job imported; `OneClickImportDebugPanel` ("Archivo importado", shown by `ImportProgress`) fetches it on demand.
-- DBF errors come back as `{ error: { code } }` (`INVALID_DBF`, `DBF_MISSING_FIELDS`, …); show them with `getDbfErrorMessage` from `api/imports.api.ts`.
-- **Bulk images** (`BulkImageUpdater.tsx`): uploads a JSON file to `POST /api/imports/bulk-images`; the default payload is imported from `src/product-images/*.json` and validated with `bulk-images.schema.ts`.
 
 ---
 
@@ -796,7 +754,7 @@ export function ProductsListPage() {
 ```env
 # .env.example
 VITE_API_URL=http://localhost:3000
-VITE_APP_NAME="San Pablo Dashboard"
+VITE_APP_NAME="FP Jacques Dashboard"
 ```
 
 ---

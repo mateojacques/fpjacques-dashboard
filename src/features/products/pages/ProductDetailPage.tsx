@@ -12,7 +12,6 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { useProduct, useDeleteProduct } from '../api/products.queries';
 import { formatPrice, formatDateTime } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
-import { DUPLICATE_HINT, ISSUE_LABELS } from '@/features/catalog/issue-labels';
 
 export function ProductDetailPage() {
   const navigate = useNavigate();
@@ -82,45 +81,6 @@ export function ProductDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main info */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Publication */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Publicación en la tienda
-                <Badge
-                  variant={product.publicationStatus === 'published' ? 'success' : 'warning'}
-                >
-                  {product.publicationStatus === 'published' ? 'Publicado' : 'Pendiente'}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {product.publicationIssues.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  {product.publicationStatus === 'published'
-                    ? 'Cumple todas las reglas de publicación.'
-                    : 'Todavía no se evaluó.'}
-                </p>
-              ) : (
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  {product.publicationIssues.map((issue) => (
-                    <li key={issue}>
-                      {ISSUE_LABELS[issue] ?? issue}
-                      {issue === 'duplicate' && (
-                        <span className="text-muted-foreground">. {DUPLICATE_HINT}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {(product.supplierName || product.supplierCode) && (
-                <p className="text-sm text-muted-foreground">
-                  Proveedor: {product.supplierName ?? '-'} · Código: {product.supplierCode ?? '-'}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Basic info */}
           <Card>
             <CardHeader>
@@ -174,14 +134,6 @@ export function ProductDetailPage() {
                     <dt className="text-sm font-medium text-muted-foreground">Precio de oferta</dt>
                     <dd className="mt-1 text-2xl font-bold text-green-600">
                       {formatPrice(product.salePrice)}
-                    </dd>
-                  </div>
-                )}
-                {product.specialPrice && (
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">Precio especial</dt>
-                    <dd className="mt-1 text-2xl font-bold text-blue-600">
-                      {formatPrice(product.specialPrice)}
                     </dd>
                   </div>
                 )}
@@ -332,7 +284,6 @@ function ProductDetailSkeleton() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-3">
-              <Skeleton className="h-16 w-full" />
               <Skeleton className="h-16 w-full" />
               <Skeleton className="h-16 w-full" />
             </div>

@@ -94,7 +94,6 @@ export function ProductsTable({ products, isLoading }: ProductsTableProps) {
               <TableHead>Categoría</TableHead>
               <TableHead className="text-right">Precio</TableHead>
               <TableHead className="text-center">Estado</TableHead>
-              <TableHead className="text-center">Publicación</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -152,15 +151,6 @@ export function ProductsTable({ products, isLoading }: ProductsTableProps) {
                 <TableCell className="text-center">
                   <Badge variant={product.isActive ? 'success' : 'secondary'}>
                     {product.isActive ? 'Activo' : 'Inactivo'}
-                  </Badge>
-                </TableCell>
-
-                {/* Publication */}
-                <TableCell className="text-center">
-                  <Badge
-                    variant={product.publicationStatus === 'published' ? 'success' : 'warning'}
-                  >
-                    {product.publicationStatus === 'published' ? 'Publicado' : 'Pendiente'}
                   </Badge>
                 </TableCell>
 
@@ -243,7 +233,6 @@ function ProductsTableSkeleton() {
             <TableHead>Categoría</TableHead>
             <TableHead className="text-right">Precio</TableHead>
             <TableHead className="text-center">Estado</TableHead>
-            <TableHead className="text-center">Publicación</TableHead>
             <TableHead className="w-[70px]"></TableHead>
           </TableRow>
         </TableHeader>

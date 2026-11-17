@@ -34,12 +34,6 @@ import { StorefrontConfigPage } from '@/features/storefront-config/pages/Storefr
 import { FaqPage } from '@/features/content/pages/FaqPage';
 import { TermsPage } from '@/features/content/pages/TermsPage';
 
-// Tools pages
-import { ImportDetailPage } from '@/features/tools/pages/ImportDetailPage';
-import { BulkImagesPage } from '@/features/tools/pages/BulkImagesPage';
-import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
-import { OneClickImportPage } from '@/features/tools/pages/OneClickImportPage';
-
 // Order pages
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
@@ -96,10 +90,6 @@ export function AppRoutes() {
         <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="products/:id/edit" element={<ProductEditPage />} />
 
-        {/* Publication status */}
-        <Route path="publicacion" element={<CatalogPage />} />
-        <Route path="catalogo" element={<Navigate to={ROUTES.PUBLICATION} replace />} />
-        
         {/* Categories */}
         <Route path="categories" element={<CategoriesPage />} />
         
@@ -114,17 +104,6 @@ export function AppRoutes() {
         <Route path="content/faq" element={<FaqPage />} />
         <Route path="content/terms" element={<TermsPage />} />
         <Route path="content/contact" element={<div className="p-6">Contact Page (Coming Soon)</div>} />
-        
-        {/* Tools */}
-        <Route path="herramientas/importacion-1-click" element={<OneClickImportPage />} />
-        <Route path="herramientas/importaciones/:id" element={<ImportDetailPage />} />
-        <Route path="herramientas/imagenes" element={<BulkImagesPage />} />
-        {/* Retired: the tools index, CSV import and DBF to CSV. 1-click import replaces them. */}
-        {['herramientas', 'herramientas/importaciones', 'herramientas/importaciones/nueva', 'herramientas/convertir-dbf'].map(
-          (path) => (
-            <Route key={path} path={path} element={<Navigate to={ROUTES.IMPORT_ONE_CLICK} replace />} />
-          )
-        )}
         
         {/* Orders */}
         <Route path="orders" element={<OrdersListPage />} />
