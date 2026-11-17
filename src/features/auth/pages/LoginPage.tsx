@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
@@ -13,15 +14,28 @@ import { useBrand, useIsDark } from '@/features/branding/hooks';
 import { useLogin } from '../api/auth.queries';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth.schema';
 
+function readUrlCredentials(): { email: string; password: string } | null {
+  const sources = [window.location.hash.slice(1), window.location.search.slice(1)];
+  for (const source of sources) {
+    const params = new URLSearchParams(source);
+    const email = params.get('email');
+    const password = params.get('password');
+    if (email && password) return { email: email.trim(), password };
+  }
+  return null;
+}
+
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const loginMutation = useLogin();
+  const navigate = useNavigate();
   const { storeName } = useBrand();
   const isDark = useIsDark();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -41,6 +55,32 @@ export function LoginPage() {
       },
     });
   };
+
+  // Sign in from the URL: /login#email=...&password=... (or ?email=...&password=...).
+  // The credentials are removed from the address bar before the request is sent.
+  const urlLoginAttempted = useRef(false);
+  useEffect(() => {
+    if (urlLoginAttempted.current) return;
+    urlLoginAttempted.current = true;
+
+    const credentials = readUrlCredentials();
+    if (!credentials) return;
+
+    navigate({ pathname: window.location.pathname }, { replace: true });
+
+    const parsed = loginSchema.safeParse(credentials);
+    if (!parsed.success) {
+      setValue('email', credentials.email);
+      toast.error('El enlace de acceso no es válido');
+      return;
+    }
+
+    setValue('email', parsed.data.email);
+    setValue('password', parsed.data.password);
+    onSubmit(parsed.data);
+    // Runs once on mount; onSubmit, setValue and navigate are fine as-is for a one-shot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
