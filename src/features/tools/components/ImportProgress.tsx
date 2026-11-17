@@ -7,9 +7,7 @@ import {
   XCircle,
   Ban,
   FileSpreadsheet,
-  ArrowLeft,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,12 +94,6 @@ export function ImportProgress({ jobId }: ImportProgressProps) {
           <p className="text-muted-foreground text-sm mt-1">
             No se pudo obtener la informacion del trabajo de importacion.
           </p>
-          <Button variant="outline" className="mt-4" asChild>
-            <Link to="/herramientas/importaciones">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a importaciones
-            </Link>
-          </Button>
         </CardContent>
       </Card>
     );
@@ -125,14 +117,6 @@ export function ImportProgress({ jobId }: ImportProgressProps) {
 
   return (
     <div className="space-y-6">
-      {/* Back button */}
-      <Button variant="ghost" size="sm" asChild>
-        <Link to="/herramientas/importaciones">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a importaciones
-        </Link>
-      </Button>
-
       <OneClickImportDebugPanel jobId={jobId} />
 
       {/* Main card */}

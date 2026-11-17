@@ -151,7 +151,7 @@ export function CatalogPage() {
     try {
       const { data } = await evaluate.mutateAsync();
       toast.success(
-        `Catálogo evaluado: ${formatCount(data.published)} publicados, ${formatCount(data.pending)} pendientes.`
+        `Publicación evaluada: ${formatCount(data.published)} publicados, ${formatCount(data.pending)} pendientes.`
       );
     } catch {
       toast.error('No se pudo evaluar el catálogo.');
@@ -167,8 +167,8 @@ export function CatalogPage() {
 
   return (
     <PageContainer
-      title="Catálogo"
-      description="Productos publicados en la tienda y productos pendientes de revisión."
+      title="Estado de publicación"
+      description="Qué productos se muestran en la tienda y, para los que no, qué les falta."
       action={
         <Button onClick={handleEvaluate} disabled={evaluate.isPending}>
           {evaluate.isPending ? (

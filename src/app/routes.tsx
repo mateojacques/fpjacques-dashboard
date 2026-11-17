@@ -11,7 +11,7 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 // Common pages
 import { NotFoundPage } from '@/components/common/NotFoundPage';
 
-// Dashboard pages
+// Home
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 
 // Product pages
@@ -35,10 +35,7 @@ import { FaqPage } from '@/features/content/pages/FaqPage';
 import { TermsPage } from '@/features/content/pages/TermsPage';
 
 // Tools pages
-import { ToolsPage } from '@/features/tools/pages/ToolsPage';
-import { CsvImportPage } from '@/features/tools/pages/CsvImportPage';
 import { ImportDetailPage } from '@/features/tools/pages/ImportDetailPage';
-import { DbfConvertPage } from '@/features/tools/pages/DbfConvertPage';
 import { BulkImagesPage } from '@/features/tools/pages/BulkImagesPage';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
 import { OneClickImportPage } from '@/features/tools/pages/OneClickImportPage';
@@ -92,13 +89,16 @@ export function AppRoutes() {
         }
       >
         <Route index element={<DashboardPage />} />
-        
-        {/* Products */}
+
+        {/* Catalogue (products) */}
         <Route path="products" element={<ProductsListPage />} />
         <Route path="products/new" element={<ProductCreatePage />} />
         <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="products/:id/edit" element={<ProductEditPage />} />
-        <Route path="catalogo" element={<CatalogPage />} />
+
+        {/* Publication status */}
+        <Route path="publicacion" element={<CatalogPage />} />
+        <Route path="catalogo" element={<Navigate to={ROUTES.PUBLICATION} replace />} />
         
         {/* Categories */}
         <Route path="categories" element={<CategoriesPage />} />
@@ -116,13 +116,15 @@ export function AppRoutes() {
         <Route path="content/contact" element={<div className="p-6">Contact Page (Coming Soon)</div>} />
         
         {/* Tools */}
-        <Route path="herramientas" element={<ToolsPage />} />
         <Route path="herramientas/importacion-1-click" element={<OneClickImportPage />} />
-        <Route path="herramientas/importaciones" element={<CsvImportPage />} />
-        <Route path="herramientas/importaciones/nueva" element={<CsvImportPage />} />
         <Route path="herramientas/importaciones/:id" element={<ImportDetailPage />} />
-        <Route path="herramientas/convertir-dbf" element={<DbfConvertPage />} />
         <Route path="herramientas/imagenes" element={<BulkImagesPage />} />
+        {/* Retired: the tools index, CSV import and DBF to CSV. 1-click import replaces them. */}
+        {['herramientas', 'herramientas/importaciones', 'herramientas/importaciones/nueva', 'herramientas/convertir-dbf'].map(
+          (path) => (
+            <Route key={path} path={path} element={<Navigate to={ROUTES.IMPORT_ONE_CLICK} replace />} />
+          )
+        )}
         
         {/* Orders */}
         <Route path="orders" element={<OrdersListPage />} />

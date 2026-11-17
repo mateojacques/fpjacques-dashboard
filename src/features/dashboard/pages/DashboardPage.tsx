@@ -1,147 +1,191 @@
 import { useState } from 'react';
-import { Package, FolderTree, Images, FileUp, ShoppingCart, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { format, formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { ChevronRight, FolderTree, Images, Package, Zap, type LucideIcon } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 import { useMetricsOverview } from '../api/metrics.queries';
-import { MetricCard } from '../components/MetricCard';
 import { DateRangeFilter } from '../components/DateRangeFilter';
 import type { MetricsParams } from '../types';
 
-const quickLinks = [
+type Shortcut = {
+  title: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+const shortcuts: Shortcut[] = [
   {
-    title: 'Productos',
-    description: 'Gestionar catalogo de productos',
-    href: '/products',
+    title: 'Importación en 1 Click',
+    description: 'Sube el DBF del sistema de inventario y actualiza los productos.',
+    href: ROUTES.IMPORT_ONE_CLICK,
+    icon: Zap,
+  },
+  {
+    title: 'Catálogo',
+    description: 'Busca, edita o elimina productos.',
+    href: ROUTES.PRODUCTS,
     icon: Package,
   },
   {
-    title: 'Categorias',
-    description: 'Organizar categorias',
-    href: '/categories',
+    title: 'Categorías',
+    description: 'Ordena el árbol de categorías de la tienda.',
+    href: ROUTES.CATEGORIES,
     icon: FolderTree,
   },
   {
     title: 'Carruseles',
-    description: 'Configurar carruseles destacados',
-    href: '/carousels',
+    description: 'Elige los productos destacados de la portada.',
+    href: ROUTES.CAROUSELS,
     icon: Images,
-  },
-  {
-    title: 'Importar CSV',
-    description: 'Importacion masiva de productos',
-    href: '/tools/import-csv',
-    icon: FileUp,
   },
 ];
 
-function formatDate(dateString: string | null): string {
-  if (!dateString) return 'Nunca';
+const formatNumber = (n: number) => n.toLocaleString('es-AR');
 
-  const date = new Date(dateString);
-  return date.toLocaleDateString('es-PY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function formatNumber(num: number): string {
-  return num.toLocaleString('es-PY');
+type StatProps = {
+  label: string;
+  value: string;
+  detail: string;
+  href: string;
+  isLoading: boolean;
+};
+
+function Stat({ label, value, detail, href, isLoading }: StatProps) {
+  return (
+    <Link
+      to={href}
+      className="group flex flex-col gap-1 bg-card px-5 py-4 outline-none transition-colors duration-150 hover:bg-accent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+    >
+      <dt className="flex items-center justify-between text-sm text-muted-foreground">
+        {label}
+        <ChevronRight className="h-4 w-4 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+      </dt>
+      {isLoading ? (
+        <dd className="space-y-2 pt-1">
+          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-3.5 w-28" />
+        </dd>
+      ) : (
+        <>
+          <dd className="text-2xl font-semibold tabular-nums tracking-tight">{value}</dd>
+          <dd className="text-xs text-muted-foreground">{detail}</dd>
+        </>
+      )}
+    </Link>
+  );
 }
 
 export function DashboardPage() {
   const { user } = useAuth();
   const [metricsParams, setMetricsParams] = useState<MetricsParams>({});
+  const { data, isLoading, isError, error } = useMetricsOverview(metricsParams);
 
-  const { data: metricsData, isLoading, isError, error } = useMetricsOverview(metricsParams);
-
-  const metrics = metricsData?.data;
-
-  const hasDateFilter = metricsParams.startDate || metricsParams.endDate;
+  const metrics = data?.data;
+  const inRange = Boolean(metricsParams.startDate || metricsParams.endDate);
+  const lastImport = metrics?.lastSuccessfulImportAt ? new Date(metrics.lastSuccessfulImportAt) : null;
+  const firstName = user?.fullName?.split(' ')[0];
 
   return (
     <PageContainer
-      title={`Bienvenido, ${user?.fullName?.split(' ')[0] ?? 'Usuario'}`}
-      description="Panel de administracion de San Pablo"
+      title={firstName ? `Hola, ${firstName}` : 'Inicio'}
+      description={capitalize(format(new Date(), "EEEE d 'de' MMMM", { locale: es }))}
     >
-      <div className="space-y-6">
-        {/* Date range filter */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold">Metricas</h2>
-          <DateRangeFilter onChange={setMetricsParams} isLoading={isLoading} />
-        </div>
-
-        {/* Error state */}
-        {isError && (
-          <Alert variant="destructive">
-            <AlertDescription>
-              Error al cargar las metricas: {error instanceof Error ? error.message : 'Error desconocido'}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Metrics cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            title="Total Productos"
-            value={metrics ? formatNumber(metrics.totalProducts) : '--'}
-            subtitle={hasDateFilter ? 'creados en el periodo' : 'productos en catalogo'}
-            icon={Package}
-            isLoading={isLoading}
-          />
-          <MetricCard
-            title="Categorias"
-            value={metrics ? formatNumber(metrics.totalCategories) : '--'}
-            subtitle={hasDateFilter ? 'creadas en el periodo' : 'categorias activas'}
-            icon={FolderTree}
-            isLoading={isLoading}
-          />
-          <MetricCard
-            title="Ordenes"
-            value={metrics ? formatNumber(metrics.totalOrders) : '--'}
-            subtitle={hasDateFilter ? 'ordenes en el periodo' : 'ordenes totales'}
-            icon={ShoppingCart}
-            isLoading={isLoading}
-          />
-          <MetricCard
-            title="Ultima Importacion"
-            value={metrics?.lastSuccessfulImportAt ? formatDate(metrics.lastSuccessfulImportAt).split(',')[0] : '--'}
-            subtitle={metrics?.lastSuccessfulImportAt ? formatDate(metrics.lastSuccessfulImportAt).split(',')[1]?.trim() || 'importacion exitosa' : 'sin importaciones'}
-            icon={Clock}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Quick links */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">Accesos Rapidos</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {quickLinks.map((link) => (
-              <Link key={link.href} to={link.href}>
-                <Card className="transition-colors hover:bg-accent">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-lg bg-primary/10 p-2">
-                        <link.icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-base">{link.title}</CardTitle>
-                        <CardDescription className="text-xs">
-                          {link.description}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
+      <div className="space-y-10">
+        <section aria-labelledby="summary-heading" className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="summary-heading" className="text-base font-semibold">
+              Resumen
+            </h2>
+            <DateRangeFilter onChange={setMetricsParams} isLoading={isLoading} />
           </div>
-        </div>
+
+          {isError && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                No se pudieron cargar las métricas.{' '}
+                {error instanceof Error ? error.message : ''}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 xl:grid-cols-4">
+            <Stat
+              label="Productos"
+              value={metrics ? formatNumber(metrics.totalProducts) : '—'}
+              detail={inRange ? 'creados en el período' : 'en el catálogo'}
+              href={ROUTES.PRODUCTS}
+              isLoading={isLoading}
+            />
+            <Stat
+              label="Categorías"
+              value={metrics ? formatNumber(metrics.totalCategories) : '—'}
+              detail={inRange ? 'creadas en el período' : 'activas'}
+              href={ROUTES.CATEGORIES}
+              isLoading={isLoading}
+            />
+            <Stat
+              label="Órdenes"
+              value={metrics ? formatNumber(metrics.totalOrders) : '—'}
+              detail={inRange ? 'recibidas en el período' : 'recibidas en total'}
+              href={ROUTES.ORDERS}
+              isLoading={isLoading}
+            />
+            <Stat
+              label="Última importación"
+              value={lastImport ? format(lastImport, 'd MMM yyyy', { locale: es }) : 'Nunca'}
+              detail={
+                lastImport
+                  ? `${capitalize(formatDistanceToNow(lastImport, { locale: es, addSuffix: true }))}, ${format(lastImport, 'HH:mm')} h`
+                  : 'Todavía no se importó ningún DBF'
+              }
+              href={ROUTES.IMPORT_ONE_CLICK}
+              isLoading={isLoading}
+            />
+          </dl>
+        </section>
+
+        <section aria-labelledby="shortcuts-heading" className="space-y-3">
+          <h2 id="shortcuts-heading" className="text-base font-semibold">
+            Atajos
+          </h2>
+          <ul className="grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-2">
+            {shortcuts.map((item, index) => (
+              <li key={item.href} className="bg-card">
+                <Link
+                  to={item.href}
+                  className="group flex h-full items-center gap-4 px-5 py-4 outline-none transition-colors duration-150 hover:bg-accent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                >
+                  <span
+                    className={cn(
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-md',
+                      index === 0
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    )}
+                  >
+                    <item.icon className="h-[18px] w-[18px]" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium">{item.title}</span>
+                    <span className="block text-sm text-muted-foreground">{item.description}</span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transform-none" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </PageContainer>
   );

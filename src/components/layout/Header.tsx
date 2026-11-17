@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { LogOut, User, Menu, Package } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,117 +11,74 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { PanelThemeMenu } from '@/features/branding/components/PanelThemeMenu';
+import { StoreLogo } from '@/features/branding/components/StoreLogo';
+import { useIsDark } from '@/features/branding/hooks';
 
-import { navigation } from './navigation';
+import { SidebarBrand, SidebarNav } from './Sidebar';
 
 export function Header() {
   const { user, logout } = useAuth();
-  const location = useLocation();
+  const isDark = useIsDark();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const closeMenu = () => setMobileMenuOpen(false);
 
-  const initials = user?.fullName
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) ?? 'U';
+  const initials =
+    user?.fullName
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) ?? 'U';
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
-      {/* Mobile menu button */}
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 md:px-6">
+      {/* Mobile: menu + logo */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden">
+          <Button variant="ghost" size="icon" className="-ml-2 md:hidden" aria-label="Abrir menú">
             <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetHeader className="border-b p-4">
-            <SheetTitle className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Package className="h-5 w-5" />
-              </div>
-              San Pablo
-            </SheetTitle>
-          </SheetHeader>
-          <ScrollArea className="h-[calc(100vh-5rem)]">
-            <nav className="space-y-4 p-4">
-              {navigation.map((section) => (
-                <div key={section.title}>
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {section.title}
-                  </h4>
-                  <ul className="space-y-1">
-                    {section.items.map((item) => {
-                      const isActive =
-                        item.href === '/'
-                          ? location.pathname === '/'
-                          : location.pathname.startsWith(item.href);
-
-                      return (
-                        <li key={item.href}>
-                          <NavLink
-                            to={item.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className={cn(
-                              'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                              isActive
-                                ? 'bg-accent text-accent-foreground'
-                                : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                            )}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.title}
-                          </NavLink>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </nav>
+        <SheetContent side="left" className="flex w-72 flex-col gap-0 border-sidebar-border bg-sidebar p-0">
+          <SheetTitle className="sr-only">Menú</SheetTitle>
+          <SidebarBrand onNavigate={closeMenu} />
+          <ScrollArea className="flex-1">
+            <SidebarNav onNavigate={closeMenu} />
           </ScrollArea>
         </SheetContent>
       </Sheet>
+      <div className="min-w-0 md:hidden">
+        <StoreLogo onDark={isDark} size="sm" />
+      </div>
 
-      {/* Spacer for desktop */}
-      <div className="hidden md:block" />
+      <div className="ml-auto flex items-center gap-1">
+        <PanelThemeMenu />
 
-      {/* Right side */}
-      <div className="flex items-center gap-4">
-        {/* User dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-              <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-primary text-primary-foreground">
+            <Button variant="ghost" className="h-9 gap-2 rounded-full pl-1 pr-1 sm:pr-3" aria-label="Cuenta">
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="bg-selection text-xs font-medium text-selection-foreground">
                   {initials}
                 </AvatarFallback>
               </Avatar>
+              <span className="hidden max-w-[12rem] truncate text-sm font-medium sm:inline">
+                {user?.fullName}
+              </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuContent className="w-60" align="end">
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.fullName}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
-              </div>
+              <p className="truncate text-sm font-medium">{user?.fullName}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
-              <User className="mr-2 h-4 w-4" />
-              <span>Perfil</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout} className="text-destructive">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Cerrar sesión</span>
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="h-4 w-4" />
+              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

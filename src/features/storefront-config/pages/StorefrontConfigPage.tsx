@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import { RefreshCw, Store, Palette, Image, Phone, Search, ClipboardList } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import { OrderingForm } from '../components/OrderingForm';
 import { useStorefrontConfig } from '../api/storefront-config.queries';
 
 export function StorefrontConfigPage() {
+  // The active tab lives in the URL so other screens can link straight to it.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') ?? 'branding';
   const { data, isLoading, isError, refetch, isRefetching } = useStorefrontConfig();
 
   if (isLoading) {
@@ -55,7 +59,11 @@ export function StorefrontConfigPage() {
         </Button>
       }
     >
-      <Tabs defaultValue="branding" className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={(tab) => setSearchParams({ tab }, { replace: true })}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 lg:w-auto lg:grid-cols-none lg:inline-flex">
           <TabsTrigger value="branding" className="gap-2">
             <Store className="h-4 w-4 hidden sm:inline" />

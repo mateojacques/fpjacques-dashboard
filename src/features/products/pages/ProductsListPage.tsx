@@ -68,8 +68,8 @@ export function ProductsListPage() {
 
   return (
     <PageContainer
-      title="Productos"
-      description="Gestiona el catálogo de productos de la tienda"
+      title="Catálogo"
+      description="Todos los productos de la tienda. Búscalos, edítalos o elimínalos desde aquí; qué se muestra en la tienda y por qué se revisa en Estado de publicación."
       action={
         <Button onClick={() => navigate(ROUTES.PRODUCT_CREATE)}>
           <Plus className="mr-2 h-4 w-4" />

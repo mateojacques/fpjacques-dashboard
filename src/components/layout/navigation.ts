@@ -1,16 +1,15 @@
 import type { ComponentType } from 'react';
 import {
-  ClipboardCheck,
+  Eye,
+  FileText,
   FolderTree,
   HelpCircle,
+  House,
   ImagePlus,
   Images,
-  LayoutDashboard,
   Package,
   Palette,
-  FileText,
   ShoppingCart,
-  Wrench,
   Zap,
 } from 'lucide-react';
 
@@ -21,41 +20,40 @@ export type NavItem = {
 };
 
 export type NavSection = {
-  title: string;
+  /** Omitted for the first, main section. */
+  title?: string;
   items: NavItem[];
 };
 
 export const navigation: NavSection[] = [
   {
-    title: 'Principal',
     items: [
-      { title: 'Dashboard', href: '/', icon: LayoutDashboard },
-      { title: 'Productos', href: '/products', icon: Package },
-      { title: 'Catálogo', href: '/catalogo', icon: ClipboardCheck },
+      { title: 'Inicio', href: '/', icon: House },
+      { title: 'Catálogo', href: '/products', icon: Package },
+      { title: 'Estado de publicación', href: '/publicacion', icon: Eye },
       { title: 'Categorías', href: '/categories', icon: FolderTree },
       { title: 'Carruseles', href: '/carousels', icon: Images },
-      { title: 'Ordenes', href: '/orders', icon: ShoppingCart },
+      { title: 'Órdenes', href: '/orders', icon: ShoppingCart },
     ],
   },
   {
-    title: 'Configuración',
-    items: [{ title: 'Apariencia', href: '/storefront', icon: Palette }],
-  },
-  {
-    title: 'Contenido',
+    title: 'Tienda',
     items: [
-      { title: 'Preguntas Frecuentes', href: '/content/faq', icon: HelpCircle },
-      { title: 'Términos y Condiciones', href: '/content/terms', icon: FileText },
+      { title: 'Apariencia', href: '/storefront', icon: Palette },
+      { title: 'Preguntas frecuentes', href: '/content/faq', icon: HelpCircle },
+      { title: 'Términos y condiciones', href: '/content/terms', icon: FileText },
     ],
   },
   {
     title: 'Herramientas',
     items: [
-      { title: 'Herramientas', href: '/herramientas', icon: Wrench },
       { title: 'Importación en 1 Click', href: '/herramientas/importacion-1-click', icon: Zap },
       { title: 'Banco de imágenes', href: '/herramientas/imagenes', icon: ImagePlus },
-      // { title: 'Importar CSV', href: '/herramientas/importaciones', icon: FileSpreadsheet },
-      // { title: 'Convertir DBF', href: '/herramientas/convertir-dbf', icon: Database },
     ],
   },
 ];
+
+export function isNavItemActive(href: string, pathname: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

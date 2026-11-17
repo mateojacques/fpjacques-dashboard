@@ -6,8 +6,6 @@ import type {
   ImportJobsParams,
 } from '../types';
 
-export type DbfCsvFormat = 'api' | 'raw';
-
 // Spanish copy for the API's DBF error codes
 export const DBF_ERROR_MESSAGES: Record<string, string> = {
   INVALID_FILE_TYPE: 'Solo se permiten archivos DBF',
@@ -42,19 +40,6 @@ export const importsApi = {
     return data;
   },
 
-  // Create a new import job by uploading a CSV file
-  create: async (file: File): Promise<ImportJobResponse> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const { data } = await api.post('/api/imports', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return data;
-  },
-
   // Upload a DBF file; the API converts it to CSV and creates an import job
   createFromDbf: async (
     file: File,
@@ -76,32 +61,6 @@ export const importsApi = {
     return data;
   },
 
-  // Convert a DBF file to CSV without importing it
-  convertDbfToCsv: async (
-    file: File,
-    format: DbfCsvFormat
-  ): Promise<{ blob: Blob; rowCount: number }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await api
-      .post('/api/imports/dbf/csv', formData, {
-        params: { format },
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        responseType: 'blob',
-      })
-      .catch(async (error) => {
-        await normalizeBlobErrorBody(error);
-        throw error;
-      });
-    return {
-      blob: response.data,
-      rowCount: Number(response.headers['x-row-count'] ?? 0),
-    };
-  },
-
   // Download the file an import job imported
   getFile: async (id: string): Promise<Blob> => {
     const { data } = await api
@@ -118,14 +77,6 @@ export const importsApi = {
   // Cancel an import job
   cancel: async (id: string): Promise<ImportJobResponse> => {
     const { data } = await api.post(`/api/imports/${id}/cancel`);
-    return data;
-  },
-
-  // Download CSV template
-  getTemplate: async (): Promise<Blob> => {
-    const { data } = await api.get('/api/imports/template', {
-      responseType: 'blob',
-    });
     return data;
   },
 

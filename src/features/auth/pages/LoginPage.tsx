@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Package } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { StoreLogo } from '@/features/branding/components/StoreLogo';
+import { useBrand, useIsDark } from '@/features/branding/hooks';
 import { useLogin } from '../api/auth.queries';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth.schema';
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const loginMutation = useLogin();
+  const { storeName } = useBrand();
+  const isDark = useIsDark();
 
   const {
     register,
@@ -40,18 +43,14 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Package className="h-6 w-6" />
-          </div>
-          <CardTitle className="text-2xl font-bold">San Pablo Dashboard</CardTitle>
-          <CardDescription>
-            Ingresa tus credenciales para acceder al panel de administración
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-sm">
+        <StoreLogo size="lg" onDark={isDark} className="mx-auto" />
+        <h1 className="mt-8 text-xl font-semibold tracking-tight">Iniciar sesión</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Administración de {storeName}
+        </p>
+        <div className="mt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Correo electrónico</Label>
@@ -114,8 +113,8 @@ export function LoginPage() {
               )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </main>
   );
 }

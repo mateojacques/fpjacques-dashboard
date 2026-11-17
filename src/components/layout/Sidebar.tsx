@@ -1,71 +1,85 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import { Package } from 'lucide-react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { StoreLogo } from '@/features/branding/components/StoreLogo';
+import { useIsDark } from '@/features/branding/hooks';
+import { usePanelThemeStore } from '@/features/branding/store';
 
-import { navigation } from './navigation';
+import { isNavItemActive, navigation } from './navigation';
 
-export function Sidebar() {
-  const location = useLocation();
+/** Whether the sidebar surface is dark, to pick the matching logo. */
+function useSidebarIsDark(): boolean {
+  const isDark = useIsDark();
+  const sidebarStyle = usePanelThemeStore((s) => s.sidebarStyle);
+  return isDark || sidebarStyle === 'brand';
+}
+
+export function SidebarBrand({ onNavigate }: { onNavigate?: () => void }) {
+  const onDark = useSidebarIsDark();
 
   return (
-    <aside className="hidden w-64 flex-shrink-0 border-r bg-sidebar md:block">
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-16 items-center gap-2 border-b px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Package className="h-5 w-5" />
-          </div>
-          <span className="font-semibold text-sidebar-foreground">San Pablo</span>
+    <Link
+      to="/"
+      onClick={onNavigate}
+      aria-label="Ir al inicio"
+      className="flex h-16 shrink-0 items-center px-4 text-sidebar-foreground outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sidebar-ring"
+    >
+      <StoreLogo onDark={onDark} />
+    </Link>
+  );
+}
+
+export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  const { pathname } = useLocation();
+
+  return (
+    <nav aria-label="Principal" className="space-y-6 px-3 pb-6 pt-2">
+      {navigation.map((section, index) => (
+        <div key={section.title ?? index}>
+          {section.title && (
+            <h2 className="mb-1 px-2.5 text-xs font-medium text-sidebar-muted">{section.title}</h2>
+          )}
+          <ul className="space-y-0.5">
+            {section.items.map((item) => {
+              const isActive = isNavItemActive(item.href, pathname);
+
+              return (
+                <li key={item.href}>
+                  <NavLink
+                    to={item.href}
+                    end={item.href === '/'}
+                    onClick={onNavigate}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm outline-none transition-colors duration-150',
+                      'focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+                      isActive
+                        ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                        : 'text-sidebar-foreground hover:bg-sidebar-hover'
+                    )}
+                  >
+                    <item.icon
+                      className={cn('h-4 w-4 shrink-0', !isActive && 'text-sidebar-muted')}
+                    />
+                    <span className="truncate">{item.title}</span>
+                  </NavLink>
+                </li>
+              );
+            })}
+          </ul>
         </div>
+      ))}
+    </nav>
+  );
+}
 
-        {/* Navigation */}
-        <ScrollArea className="flex-1 py-4">
-          <nav className="space-y-6 px-3">
-            {navigation.map((section) => (
-              <div key={section.title}>
-                <h4 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
-                  {section.title}
-                </h4>
-                <ul className="space-y-1">
-                  {section.items.map((item) => {
-                    const isActive =
-                      item.href === '/'
-                        ? location.pathname === '/'
-                        : location.pathname.startsWith(item.href);
-
-                    return (
-                      <li key={item.href}>
-                        <NavLink
-                          to={item.href}
-                          className={cn(
-                            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                            isActive
-                              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          {item.title}
-                        </NavLink>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </nav>
-        </ScrollArea>
-
-        {/* Footer */}
-        <div className="border-t p-4">
-          <Separator className="mb-4" />
-          <p className="text-xs text-sidebar-foreground/50 text-center">
-            San Pablo Dashboard v2.0
-          </p>
-        </div>
-      </div>
+export function Sidebar() {
+  return (
+    <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar md:flex md:flex-col">
+      <SidebarBrand />
+      <ScrollArea className="flex-1">
+        <SidebarNav />
+      </ScrollArea>
     </aside>
   );
 }

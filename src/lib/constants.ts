@@ -1,5 +1,3 @@
-export const APP_NAME = 'San Pablo Dashboard';
-
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const PAGINATION = {
@@ -15,6 +13,7 @@ export const ROUTES = {
   PRODUCT_CREATE: '/products/new',
   PRODUCT_EDIT: '/products/:id/edit',
   PRODUCT_DETAIL: '/products/:id',
+  PUBLICATION: '/publicacion',
   CATEGORIES: '/categories',
   CAROUSELS: '/carousels',
   CAROUSEL_EDIT: '/carousels/:id',
@@ -24,11 +23,9 @@ export const ROUTES = {
   FAQ: '/content/faq',
   TERMS: '/content/terms',
   CONTACT: '/content/contact',
-  TOOLS: '/tools',
-  IMPORT_CSV: '/tools/import-csv',
-  IMPORT_DBF: '/tools/import-dbf',
   IMPORT_ONE_CLICK: '/herramientas/importacion-1-click',
-  BULK_IMAGES: '/tools/bulk-images',
+  IMPORT_DETAIL: '/herramientas/importaciones/:id',
+  IMAGE_BANK: '/herramientas/imagenes',
 } as const;
 
 export const ORDER_STATUS = {

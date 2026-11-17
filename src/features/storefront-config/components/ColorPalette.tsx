@@ -94,7 +94,8 @@ export function ColorPalette({ initialData }: ColorPaletteProps) {
           Paleta de Colores
         </CardTitle>
         <CardDescription>
-          Define los colores principales de tu tienda.
+          Define los colores principales de tu tienda. Este panel también los usa: cada
+          persona elige cuál aplicar desde «Personalizar panel», arriba a la derecha.
         </CardDescription>
       </CardHeader>
       <CardContent>

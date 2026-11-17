@@ -10,7 +10,8 @@ Administrative dashboard for an art store/bookstore (San Pablo). This SPA provid
 - **Orders**: order list, detail and status updates
 - **Brand customization**: logos, colors, banners (including hero banner), contact & social links, SEO
 - **Content management**: Terms & Conditions, FAQ
-- **Bulk import tools**: 1-click DBF import, CSV import, DBF conversion, bulk image updates
+- **Bulk import tools**: 1-click DBF import, image bank
+- **Panel theme**: the panel takes the store's logo and palette; each admin picks light/dark, accent color and sidebar style
 
 The UI is in Spanish (labels, toasts, validation messages); numbers are formatted with the `es-AR` locale.
 
@@ -37,7 +38,6 @@ The dashboard consumes a REST API documented at `http://localhost:3000/api/docs`
 | Drag & Drop | @dnd-kit | core 6.x / sortable 10.x |
 | Notifications | Sonner | 1.7+ |
 | File Drop | react-dropzone | 14.x |
-| CSV Parsing | PapaParse | 5.4+ |
 | Dates | date-fns | 4.x |
 | Linting | ESLint (flat config) + typescript-eslint | 9.x |
 
@@ -50,7 +50,6 @@ There is no test runner configured.
 ```
 sanpablo-dashboard-v2/
 ├── public/
-│   ├── favicon.svg
 │   └── _redirects                  # SPA fallback: /* -> /index.html 200
 ├── src/
 │   ├── app/
@@ -67,7 +66,6 @@ sanpablo-dashboard-v2/
 │   │   │   ├── Header.tsx          # Top header bar
 │   │   │   └── PageContainer.tsx   # Page wrapper with title/description/action
 │   │   └── common/
-│   │       ├── Breadcrumbs.tsx
 │   │       ├── ConfirmDialog.tsx   # Confirmation modal
 │   │       ├── EmptyState.tsx      # Empty data state
 │   │       ├── LoadingSpinner.tsx  # Loading indicator
@@ -83,7 +81,7 @@ sanpablo-dashboard-v2/
 │   │   │
 │   │   ├── dashboard/
 │   │   │   ├── api/                # metrics.api.ts, metrics.queries.ts
-│   │   │   ├── components/         # MetricCard, DateRangeFilter
+│   │   │   ├── components/         # DateRangeFilter
 │   │   │   ├── pages/DashboardPage.tsx
 │   │   │   └── types.ts
 │   │   │
@@ -128,10 +126,10 @@ sanpablo-dashboard-v2/
 │   │   └── tools/
 │   │       ├── api/                # imports.api.ts, imports.queries.ts
 │   │       ├── components/         # OneClickImporter, OneClickImportDebugPanel,
-│   │       │                       # CsvImporter, DbfConverter, BulkImageUpdater,
+│   │       │                       # ImageBankUploader, ImportJobsTable,
 │   │       │                       # ImportProgress, ImportJobsTable
-│   │       ├── pages/              # ToolsPage, OneClickImportPage, CsvImportPage,
-│   │       │                       # ImportDetailPage, DbfConvertPage, BulkImagesPage
+│   │       ├── pages/              # OneClickImportPage, ImportDetailPage,
+│   │       │                       # BulkImagesPage
 │   │       └── types.ts
 │   │
 │   ├── lib/
@@ -263,7 +261,7 @@ import type { Product } from '../types';
 
 All routes live in `src/app/routes.tsx`. Everything except `/login` is nested under `ProtectedRoute` → `MainLayout`; `/login` is wrapped in `PublicRoute` (redirects home when already authenticated).
 
-Tool routes use Spanish paths under `/herramientas/...` (e.g. `/herramientas/importacion-1-click`, `/herramientas/imagenes`, `/herramientas/importaciones/:id`). Note that the `ROUTES` constant in `src/lib/constants.ts` still lists outdated `/tools/...` paths for most tool entries — check `routes.tsx` for the real paths.
+Tool routes use Spanish paths under `/herramientas/...` (e.g. `/herramientas/importacion-1-click`, `/herramientas/imagenes`, `/herramientas/importaciones/:id`). They are listed in the `ROUTES` constant in `src/lib/constants.ts`. The old tools index, CSV import (`/herramientas/importaciones`) and DBF→CSV (`/herramientas/convertir-dbf`) pages were retired and redirect to the 1-click import.
 
 Sidebar entries are declared in `src/components/layout/navigation.ts`.
 
@@ -728,7 +726,6 @@ The `content` feature (FAQ / Terms pages) reads and writes through these same en
 
 - **This repo does no DBF parsing.** All DBF knowledge (reader, field mapping, CSV format) lives in `sanpablo-api-v2/src/modules/imports/dbf/`.
 - **1-click import** (`OneClickImporter.tsx`): the user drops a Visual FoxPro `.dbf` (max 100MB, extension checked case-insensitively) and it is uploaded as-is to `POST /api/imports/dbf`, which converts it and creates a CSV import job. Progress is shown by polling the job.
-- **DBF converter** (`DbfConverter.tsx`): calls `POST /api/imports/dbf/csv?format=api|raw` (`api` = import columns, `raw` = every DBF column) and previews the first rows with PapaParse.
 - **Imported file**: `GET /api/imports/:id/file` serves the exact file a job imported; `OneClickImportDebugPanel` ("Archivo importado", shown by `ImportProgress`) fetches it on demand.
 - DBF errors come back as `{ error: { code } }` (`INVALID_DBF`, `DBF_MISSING_FIELDS`, …); show them with `getDbfErrorMessage` from `api/imports.api.ts`.
 - **Bulk images** (`BulkImageUpdater.tsx`): uploads a JSON file to `POST /api/imports/bulk-images`; the default payload is imported from `src/product-images/*.json` and validated with `bulk-images.schema.ts`.
@@ -775,7 +772,7 @@ export function ProductsListPage() {
   const { data, isLoading } = useProducts(filters);
 
   return (
-    <PageContainer title="Productos" description="Gestiona el catálogo de productos de la tienda">
+    <PageContainer title="Catálogo" description="Todos los productos de la tienda.">
       <ProductsTable products={data?.data ?? []} isLoading={isLoading} />
       {data && data.totalPages > 0 && (
         <Pagination

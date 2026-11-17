@@ -16,19 +16,17 @@ export function PageContainer({
   className,
 }: PageContainerProps) {
   return (
-    <div className={cn('p-6', className)}>
-      {/* Page header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+    <div className={cn('mx-auto w-full max-w-[1400px] px-4 py-6 md:px-8 md:py-8', className)}>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           {description && (
-            <p className="mt-1 text-muted-foreground">{description}</p>
+            <p className="mt-1 max-w-[65ch] text-sm text-muted-foreground">{description}</p>
           )}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
       </div>
 
-      {/* Page content */}
       {children}
     </div>
   );

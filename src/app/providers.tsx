@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { PanelThemeSync } from '@/features/branding/components/PanelThemeSync';
+import { useIsDark } from '@/features/branding/hooks';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +23,11 @@ const queryClient = new QueryClient({
   },
 });
 
+function ThemedToaster() {
+  const isDark = useIsDark();
+  return <Toaster position="top-right" richColors closeButton theme={isDark ? 'dark' : 'light'} />;
+}
+
 type ProvidersProps = {
   children: React.ReactNode;
 };
@@ -28,10 +35,11 @@ type ProvidersProps = {
 export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
+      <PanelThemeSync />
       <BrowserRouter>
         <TooltipProvider delayDuration={0}>
           {children}
-          <Toaster position="top-right" richColors closeButton />
+          <ThemedToaster />
         </TooltipProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />

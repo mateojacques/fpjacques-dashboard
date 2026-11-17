@@ -49,6 +49,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
         },
+        selection: {
+          DEFAULT: 'hsl(var(--selection))',
+          foreground: 'hsl(var(--selection-foreground))',
+        },
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -60,6 +64,8 @@ const config: Config = {
           'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
           accent: 'hsl(var(--sidebar-accent))',
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          muted: 'hsl(var(--sidebar-muted))',
+          hover: 'hsl(var(--sidebar-hover))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
