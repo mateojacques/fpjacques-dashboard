@@ -21,9 +21,9 @@ export type BrandPalette = {
 
 // Same fallback the storefront uses when its config can't be loaded.
 export const FALLBACK_PALETTE: BrandPalette = {
-  primary: '#4a90d9',
-  secondary: '#2c5282',
-  accent: '#ed8936',
+  primary: '#e1161f',
+  secondary: '#0b0b0b',
+  accent: '#701216',
 };
 
 export type ThemeOptions = {
